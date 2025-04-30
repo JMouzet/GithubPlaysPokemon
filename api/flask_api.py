@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file, make_response
+from flask import Flask, render_template, send_file, make_response, redirect
 from flask_limiter import Limiter, RequestLimit
 from flask_limiter.util import get_remote_address
 import sqlite3
@@ -8,10 +8,15 @@ import os
 
 # Load environment variables
 load_dotenv()
-LANG = os.getenv("LANGUAGE", "en")
 LIMIT = str(os.getenv("RATE_LIMIT", "2"))
+REDIRECT = os.getenv("AUTO_REDIRECT", "http://localhost:5000")
+USERNAME = os.getenv("GITHUB_USERNAME", "admin")
+LANG = os.getenv("LANGUAGE", "en")
 
 def rate_limited(request_limit: RequestLimit) -> None:
+    # Return the rate limit error page or redirect to Github profile
+    if REDIRECT:
+        return redirect("https://github.com/" + USERNAME, code=302)
     return make_response(
         render_template(os.path.join(LANG, "rate_limit.html"), limit=LIMIT),
         429
@@ -47,7 +52,9 @@ def input(input):
         conn.commit()
         conn.close()
 
-        # Return the success page
+        # Return the success page or redirect to Github profile
+        if REDIRECT:
+            return redirect("https://github.com/" + USERNAME, code=302)
         return render_template(os.path.join(LANG, "ok.html"), input=str.capitalize(input))
     except sqlite3.Error as e:
         # Return the SQL error page in case of a database error

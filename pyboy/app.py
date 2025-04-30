@@ -7,7 +7,7 @@ import sqlite3
 
 # Load environment variables
 load_dotenv()
-DELAY = int(os.getenv("SCREEN_DELAY", 5))
+DELAY = int(os.getenv("SCREEN_DELAY", 10))
 
 
 # Delete the screenshot
@@ -101,5 +101,5 @@ if __name__ == "__main__":
     # Close the database connection
     conn.close()
 
-    # Stop the emulator
-    pyboy.stop()
+    # Stop the emulator without saving
+    pyboy.stop(False)
