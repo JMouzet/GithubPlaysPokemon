@@ -1,0 +1,6 @@
+# NEVER include ROM files EVER!
+rom/*.gb
+rom/*.gbc
+
+# Ignore saves
+save/*.state
