@@ -7,7 +7,7 @@ import sqlite3
 
 # Load environment variables
 load_dotenv()
-DELAY = int(os.getenv("SCREEN_DELAY"))
+DELAY = int(os.getenv("SCREEN_DELAY"), 5)
 
 
 # Delete the screenshot
