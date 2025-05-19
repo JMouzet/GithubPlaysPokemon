@@ -2,7 +2,7 @@ services:
   api:
     build: ./api
     ports:
-      - "${API_PORT}:5000"
+      - "${API_PORT:-5000}:5000"
     restart: on-failure
     volumes:
       - ./shared:/shared

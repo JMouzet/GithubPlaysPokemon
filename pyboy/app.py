@@ -9,6 +9,18 @@ import sqlite3
 load_dotenv()
 DELAY = int(os.getenv("SCREEN_DELAY", 10))
 
+# Saves backup function
+def roll_states():
+    # Delete backup 2
+    if os.path.exists("/save/game.gb.state.2"):
+        os.remove("/save/game.gb.state.2")
+    # Rename backup 1 to backup 2
+    if os.path.exists("/save/game.gb.state.1"):
+        os.rename("/save/game.gb.state.1", "/save/game.gb.state.2")
+    # Rename current to backup 1
+    if os.path.exists("/save/game.gb.state"):
+        os.rename("/save/game.gb.state", "/save/game.gb.state.1")
+
 
 # Delete the screenshot
 if os.path.exists("/shared/screen/screen.png"):
@@ -35,7 +47,14 @@ cur = conn.cursor()
 
 
 # Start the PyBoy emulator
-pyboy = PyBoy("./rom/game.gb", window="null")
+if os.path.exists("/rom/game.gbc"):
+    pyboy = PyBoy("./rom/game.gbc", window="null")
+elif os.path.exists("/rom/game.gb"):
+    pyboy = PyBoy("./rom/game.gb", window="null")
+else:
+    print("No ROM found")
+    exit(1)
+
 pyboy.set_emulation_speed(1)
 
 # Load a save state if found
@@ -84,11 +103,16 @@ if __name__ == "__main__":
 
         # Save the current state every 10 minutes
         if frame % (60 * 10) == 0:
+            # Roll the states
+            roll_states()
+            # Save the current state
             with open("/save/game.gb.state", "wb") as f:
                 pyboy.save_state(f)
         
         frame += 1
     
+    # Roll the states
+    roll_states()
     # Save the current state
     with open("/save/game.gb.state", "wb") as f:
         pyboy.save_state(f)
